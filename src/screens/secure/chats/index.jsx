@@ -26,6 +26,7 @@ import { useAuth } from "../../../context/user.context";
 const Chat = ({ setHide }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [modal, setModal] = React.useState("");
+  let lastMsg;
 
   const { user } = useAuth();
   const [matches, setMatches] = React.useState([]);
@@ -47,7 +48,7 @@ const Chat = ({ setHide }) => {
     [user]
   );
 
-  console.log(matches);
+  console.log({ matches });
   return (
     <>
       {modal === "video" && (
@@ -57,28 +58,48 @@ const Chat = ({ setHide }) => {
       <DesktopView>
         <Container className="flex jc-space-btw">
           <Inner>
-            <InputContainer className="flex ai-center">
-              <div>
-                <BiSearchAlt color="rgba(0, 0, 0, 0.4)" size={20} />
-              </div>
-              <Input placeholder="Search" />
-            </InputContainer>
-            <ChatContainer onClick={() => setIsOpen(true)} className="mt-1">
-              <div className="flex ai-center">
-                <div className="profile-img" />
-                <div className="flex-1">
-                  <div className="flex jc-space-btw">
-                    <div className="profile-name">Mary</div>
-                    <div className="time">21min</div>
-                  </div>
-                  <div className="flex jc-space-btw">
-                    <div className="msg">See you soon</div>
-                    <div></div>
-                  </div>
+            {matches.length > 0 && (
+              <InputContainer className="flex ai-center">
+                <div>
+                  <BiSearchAlt color="rgba(0, 0, 0, 0.4)" size={20} />
                 </div>
-              </div>
-            </ChatContainer>
-            <ChatContainer className="mt-1">
+                <Input placeholder="Search" />
+              </InputContainer>
+            )}
+            {matches.map((each) => {
+              // console.log(new Date(each.timestamp));
+              console.log(
+                new Date(each.timestamp.seconds * 1000)
+                  .toTimeString()
+                  .split(" ")[0]
+              );
+              return (
+                <ChatContainer onClick={() => setIsOpen(true)} className="mt-1">
+                  <div className="flex ai-center">
+                    <div className="profile-img" />
+                    <div className="flex-1">
+                      <div className="flex jc-space-btw">
+                        <div className="profile-name">
+                          {each.swipedUser.name}
+                        </div>
+                        <div className="time">
+                          {
+                            new Date(each.timestamp.seconds * 1000)
+                              .toTimeString()
+                              .split(" ")[0]
+                          }
+                        </div>
+                      </div>
+                      <div className="flex jc-space-btw">
+                        <div className="msg">{lastMsg || "Say Hi"}</div>
+                      </div>
+                    </div>
+                  </div>
+                </ChatContainer>
+              );
+            })}
+
+            {/* <ChatContainer className="mt-1">
               <div className="flex ai-center">
                 <div className="profile-img" />
                 <div className="flex-1">
@@ -94,8 +115,9 @@ const Chat = ({ setHide }) => {
                   </div>
                 </div>
               </div>
-            </ChatContainer>
+            </ChatContainer> */}
           </Inner>
+
           {isOpen && (
             <Inner>
               <Header className="flex ai-center">
